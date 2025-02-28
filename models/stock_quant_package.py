@@ -44,24 +44,50 @@ class StockQuantPackage(models.Model):
     vendor_package_ref = fields.Char(string="Vendor Package Reference")
     is_vendor_package = fields.Boolean(string="Vendor Package", default=False)
     
-    @api.depends('quant_ids')
+    @api.depends('quant_ids', 'child_package_ids', 'child_package_ids.quant_ids')
     def _compute_content_details(self):
         for package in self:
             details = []
+            
+            # Add direct quants
             for quant in package.quant_ids:
                 if quant.product_id and quant.product_uom_id:
                     product_code = quant.product_id.default_code or ''
                     details.append(f'[{product_code}] {quant.product_id.name} - {quant.quantity} {quant.product_uom_id.name}')
+            
+            # Add quants from child packages
+            for child in package.child_package_ids:
+                for quant in child.quant_ids:
+                    if quant.product_id and quant.product_uom_id:
+                        product_code = quant.product_id.default_code or ''
+                        details.append(f'[{product_code}] {quant.product_id.name} - {quant.quantity} {quant.product_uom_id.name} (in {child.name})')
+            
             package.content_details = "\n".join(details) if details else False
     
-    @api.depends('quant_ids', 'quant_ids.product_id', 'quant_ids.quantity')
+    @api.depends('quant_ids', 'quant_ids.product_id', 'quant_ids.quantity', 
+                 'child_package_ids', 'child_package_ids.quant_ids')
     def _compute_product_stats(self):
         for package in self:
-            products = package.quant_ids.mapped('product_id')
-            package.product_count = len(products)
-            package.total_quantity = sum(package.quant_ids.mapped('quantity'))
+            # Direct products in this package
+            direct_products = package.quant_ids.mapped('product_id')
+            direct_quantity = sum(package.quant_ids.mapped('quantity'))
+            
+            # Products in child packages
+            child_products = self.env['product.product']
+            child_quantity = 0.0
+            
+            for child in package.child_package_ids:
+                child_products |= child.quant_ids.mapped('product_id')
+                child_quantity += sum(child.quant_ids.mapped('quantity'))
+            
+            # Combine unique products from this package and all child packages
+            all_products = direct_products | child_products
+            
+            package.product_count = len(all_products)
+            package.total_quantity = direct_quantity + child_quantity
     
-    @api.depends('quant_ids.quantity', 'quant_ids.product_id.weight', 'package_type_id.base_weight')
+    @api.depends('quant_ids.quantity', 'quant_ids.product_id.weight', 
+                 'package_type_id.base_weight', 'child_package_ids')
     def _compute_weights(self):
         for package in self:
             # Calculate product weight
