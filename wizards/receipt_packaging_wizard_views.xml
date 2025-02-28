@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Receipt Packaging Wizard Form View -->
+    <record id="view_receipt_packaging_wizard_form" model="ir.ui.view">
+        <field name="name">receipt.packaging.wizard.form</field>
+        <field name="model">receipt.packaging.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Record Packaging Information">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="picking_id" readonly="1"/>
+                            <field name="is_vendor_packaging"/>
+                            <field name="auto_create_vendor_packaging" 
+                                   invisible="not is_vendor_packaging"/>
+                        </group>
+                        <group>
+                            <field name="repackage_after_receipt" 
+                                   invisible="not is_vendor_packaging"/>
+                            <field name="quality_check_required"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products Received">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="received_qty" readonly="1"/>
+                                    <field name="is_vendor_packaged" invisible="not parent.is_vendor_packaging"/>
+                                    <field name="vendor_package_ref" 
+                                           placeholder="Vendor's package reference"
+                                           invisible="not parent.is_vendor_packaging or not is_vendor_packaged"/>
+                                    <field name="packaging_id" 
+                                           options="{'no_create': True}"
+                                           invisible="parent.is_vendor_packaging and is_vendor_packaged and not parent.auto_create_vendor_packaging"/>
+                                    <field name="package_count"/>
+                                    <field name="needs_repackaging" 
+                                           invisible="not parent.is_vendor_packaging"/>
+                                    <field name="repackaging_note" 
+                                           placeholder="Notes for repackaging"
+                                           invisible="not parent.is_vendor_packaging or not needs_repackaging"/>
+                                    <field name="move_line_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Create Packages" 
+                            type="object" 
+                            name="apply_packaging" 
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

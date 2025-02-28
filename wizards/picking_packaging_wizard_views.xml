@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Picking Packaging Wizard Form View -->
+    <record id="view_picking_packaging_wizard_form" model="ir.ui.view">
+        <field name="name">picking.packaging.wizard.form</field>
+        <field name="model">picking.packaging.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Select Packaging Types">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="picking_id" readonly="1"/>
+                            <field name="package_prefix" placeholder="Enter prefix for package names"/>
+                        </group>
+                        <group string="Secondary Packaging">
+                            <field name="create_secondary_packaging"/>
+                            <field name="group_by_product" 
+                                   invisible="not create_secondary_packaging"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products to Package">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="qty_to_package"/>
+                                    <field name="packaging_id" options="{'no_create': True}"/>
+                                    <field name="move_line_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Create Packages" 
+                            type="object" 
+                            name="apply_packaging" 
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
