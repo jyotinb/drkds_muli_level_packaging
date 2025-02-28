@@ -124,8 +124,10 @@
                             </div>
                         </div>
                         
-                        <div class="row mt-4">
+                        <!-- Direct contents - products in this package -->
+                        <div class="row mt-4" t-if="o.quant_ids">
                             <div class="col-12">
+                                <h4>Direct Contents</h4>
                                 <table class="table table-sm table-bordered">
                                     <thead>
                                         <tr>
@@ -151,6 +153,7 @@
                             </div>
                         </div>
                         
+                        <!-- Inner package contents -->
                         <div class="row mt-4" t-if="o.child_package_ids">
                             <div class="col-12">
                                 <h4>Contained Packages</h4>
@@ -162,6 +165,7 @@
                                             <th>Product Count</th>
                                             <th>Total Quantity</th>
                                             <th>Weight</th>
+                                            <th>Contents</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -172,8 +176,43 @@
                                                 <td><span t-field="child.product_count"/></td>
                                                 <td><span t-field="child.total_quantity"/></td>
                                                 <td><span t-field="child.gross_weight"/> kg</td>
+                                                <td>
+                                                    <t t-foreach="child.quant_ids" t-as="quant">
+                                                        <div>
+                                                            <t t-if="quant.product_id.default_code">
+                                                                [<t t-esc="quant.product_id.default_code"/>]
+                                                            </t>
+                                                            <t t-esc="quant.product_id.name"/> - 
+                                                            <t t-esc="quant.quantity"/>
+                                                            <t t-esc="quant.product_uom_id.name"/>
+                                                        </div>
+                                                    </t>
+                                                </td>
                                             </tr>
                                         </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary of all products in all packages -->
+                        <div class="row mt-4" t-if="o.child_package_ids">
+                            <div class="col-12">
+                                <h4>Total Products Summary</h4>
+                                <p>Combined summary of all products in this package and contained packages.</p>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Code</th>
+                                            <th>Total Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- This requires a custom computation in the controller -->
+                                        <tr t-foreach="o.content_details.split('\n')" t-as="content_line">
+                                            <td colspan="3"><t t-esc="content_line"/></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
