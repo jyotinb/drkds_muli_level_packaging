@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Package Label Template -->
+    <template id="report_package_label">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h2>Package Label</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div t-field="o.name" class="h3 mb-3"/>
+                                    <div t-if="o.package_type_id">
+                                        <span t-field="o.package_type_id.name"/>
+                                    </div>
+                                    <div t-if="o.packaging_date">
+                                        <span t-field="o.packaging_date"/>
+                                    </div>
+                                    <div t-if="o.is_vendor_package" class="mt-2">
+                                        <strong>Vendor Package</strong>
+                                        <div t-if="o.vendor_package_ref">
+                                            <span t-field="o.vendor_package_ref"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <!-- QR Code for package -->
+                                <img t-att-src="'/report/barcode/?type=QR&amp;value=%s&amp;width=150&amp;height=150' % o.name" class="img img-fluid"/>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <div><strong>Package Level:</strong> <span t-field="o.package_level"/></div>
+                                <div><strong>Gross Weight:</strong> <span t-field="o.gross_weight"/> kg</div>
+                                <div><strong>Net Weight:</strong> <span t-field="o.net_weight"/> kg</div>
+                                <div t-if="o.mo_id"><strong>Manufacturing Order:</strong> <span t-field="o.mo_id.name"/></div>
+                                <div t-if="o.picking_id"><strong>Transfer:</strong> <span t-field="o.picking_id.name"/></div>
+                                <div t-if="o.purchase_id"><strong>Purchase Order:</strong> <span t-field="o.purchase_id.name"/></div>
+                            </div>
+                            <div class="col-6">
+                                <div t-if="o.quality_state" class="mt-2">
+                                    <strong>Quality Status: </strong>
+                                    <span t-field="o.quality_state" 
+                                          t-attf-class="badge badge-pill {{
+                                              o.quality_state == 'approved' and 'badge-success' or
+                                              o.quality_state == 'pending' and 'badge-warning' or
+                                              o.quality_state == 'rejected' and 'badge-danger' or
+                                              'badge-secondary'
+                                          }}"/>
+                                </div>
+                                <div t-if="o.parent_package_id" class="mt-2">
+                                    <strong>Inside Package: </strong>
+                                    <span t-field="o.parent_package_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Contents</h4>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>UoM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.quant_ids" t-as="quant">
+                                            <tr>
+                                                <td>
+                                                    <span t-if="quant.product_id.default_code">
+                                                        [<span t-field="quant.product_id.default_code"/>]
+                                                    </span>
+                                                    <span t-field="quant.product_id.name"/>
+                                                </td>
+                                                <td><span t-field="quant.quantity"/></td>
+                                                <td><span t-field="quant.product_uom_id.name"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    
+    <!-- Package Content Template -->
+    <template id="report_package_content">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h2>Package Content</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <div><strong>Package:</strong> <span t-field="o.name"/></div>
+                                <div t-if="o.package_type_id"><strong>Type:</strong> <span t-field="o.package_type_id.name"/></div>
+                                <div><strong>Package Level:</strong> <span t-field="o.package_level"/></div>
+                                <div><strong>Packaging Date:</strong> <span t-field="o.packaging_date"/></div>
+                            </div>
+                            <div class="col-6">
+                                <div><strong>Gross Weight:</strong> <span t-field="o.gross_weight"/> kg</div>
+                                <div><strong>Net Weight:</strong> <span t-field="o.net_weight"/> kg</div>
+                                <div><strong>Product Count:</strong> <span t-field="o.product_count"/></div>
+                                <div><strong>Total Quantity:</strong> <span t-field="o.total_quantity"/></div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Code</th>
+                                            <th>Lot/Serial</th>
+                                            <th>Quantity</th>
+                                            <th>UoM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.quant_ids" t-as="quant">
+                                            <tr>
+                                                <td><span t-field="quant.product_id.name"/></td>
+                                                <td><span t-field="quant.product_id.default_code"/></td>
+                                                <td><span t-field="quant.lot_id.name"/></td>
+                                                <td><span t-field="quant.quantity"/></td>
+                                                <td><span t-field="quant.product_uom_id.name"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4" t-if="o.child_package_ids">
+                            <div class="col-12">
+                                <h4>Contained Packages</h4>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Package</th>
+                                            <th>Type</th>
+                                            <th>Product Count</th>
+                                            <th>Total Quantity</th>
+                                            <th>Weight</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.child_package_ids" t-as="child">
+                                            <tr>
+                                                <td><span t-field="child.name"/></td>
+                                                <td><span t-field="child.package_type_id.name"/></td>
+                                                <td><span t-field="child.product_count"/></td>
+                                                <td><span t-field="child.total_quantity"/></td>
+                                                <td><span t-field="child.gross_weight"/> kg</td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div t-if="o.is_vendor_package" class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <strong>Vendor Package Information</strong>
+                                    <p>Vendor Package Reference: <span t-field="o.vendor_package_ref"/></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
