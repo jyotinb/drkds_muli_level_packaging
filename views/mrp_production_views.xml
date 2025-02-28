@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Manufacturing Order Form View -->
+    <record id="view_mrp_production_form_packaging" model="ir.ui.view">
+        <field name="name">mrp.production.form.packaging</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add packaging buttons to header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_open_packaging_wizard" 
+                        string="Create Packages" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="not can_create_packages"/>
+                <button name="action_create_secondary_packages" 
+                        string="Create Secondary Packages" 
+                        type="object" 
+                        class="btn-secondary"
+                        invisible="package_count == 0"/>
+                <button name="action_view_packages" 
+                        string="View Packages" 
+                        type="object" 
+                        class="btn-secondary"
+                        invisible="package_count == 0"/>
+            </xpath>
+            
+            <!-- Add packaging info to the form -->
+            <xpath expr="//page[@name='miscellaneous']" position="after">
+                <page string="Packaging" name="packaging" invisible="state != 'done'">
+                    <group>
+                        <group string="Packaging Status">
+                            <field name="can_create_packages" invisible="1"/>
+                            <field name="package_count"/>
+                            <field name="qty_packaged"/>
+                            <field name="is_packaged"/>
+                            <field name="packaging_efficiency" widget="progressbar"/>
+                        </group>
+                        <group string="Package Details">
+                            <field name="primary_package_count"/>
+                            <field name="secondary_package_count"/>
+                            <field name="tertiary_package_count"/>
+                        </group>
+                    </group>
+                    <separator string="Packages"/>
+                    <field name="can_create_packages" invisible="1"/>
+                    <field name="is_packaged" invisible="1"/>
+                    <button name="action_view_packages" 
+                            type="object" 
+                            string="View All Packages" 
+                            class="oe_highlight" 
+                            invisible="package_count == 0"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Manufacturing Order List View -->
+    <record id="view_mrp_production_tree_packaging" model="ir.ui.view">
+        <field name="name">mrp.production.tree.packaging</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="package_count" optional="show"/>
+                <field name="is_packaged" optional="hide"/>
+            </field>
+        </field>
+    </record>
+	</odoo>

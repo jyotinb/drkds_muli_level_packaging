@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Enhanced Product Packaging Form View -->
+    <record id="product_packaging_form_view_enhanced" model="ir.ui.view">
+        <field name="name">product.packaging.form.enhanced</field>
+        <field name="model">product.packaging</field>
+        <field name="inherit_id" ref="product.product_packaging_form_view"/>
+        <field name="arch" type="xml">
+            <field name="barcode" position="after">
+                <field name="packaging_level"/>
+                <field name="inner_qty" 
+                       invisible="packaging_level == 'primary'"/>
+                <field name="parent_id" 
+                       invisible="packaging_level == 'tertiary'" 
+                       domain="[('packaging_level', '!=', 'primary'), ('product_id', '=', product_id)]"/>
+                <field name="material"/>
+                <field name="is_vendor_packaging"/>
+                <field name="vendor_ids" 
+                       widget="many2many_tags" 
+                       options="{'no_create': True}" 
+                       invisible="not is_vendor_packaging" 
+                       domain="[('supplier_rank', '>', 0)]"/>
+                <field name="tare_weight"/>
+                <field name="max_weight"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Product Packaging Tree View Enhanced -->
+    <record id="product_packaging_tree_view_enhanced" model="ir.ui.view">
+        <field name="name">product.packaging.tree.enhanced</field>
+        <field name="model">product.packaging</field>
+        <field name="inherit_id" ref="product.product_packaging_tree_view"/>
+        <field name="arch" type="xml">
+            <tree position="attributes">
+                <attribute name="decoration-primary">is_vendor_packaging</attribute>
+                <attribute name="decoration-warning">packaging_level == 'tertiary'</attribute>
+                <attribute name="decoration-info">packaging_level == 'secondary'</attribute>
+            </tree>
+            <field name="name" position="after">
+                <field name="packaging_level"/>
+            </field>
+            <field name="qty" position="after">
+                <field name="inner_qty" optional="show"/>
+                <field name="is_vendor_packaging" optional="show"/>
+                <field name="tare_weight" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Product Form View - Add Packaging Tab -->
+    <record id="product_normal_form_view_packaging" model="ir.ui.view">
+        <field name="name">product.product.form.packaging.enhanced</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='inventory']" position="after">
+                <page string="Packaging" name="packaging">
+                    <group>
+                        <group string="Packaging Options">
+                            <field name="packaging_ids" 
+                                   nolabel="1" 
+                                   context="{'default_product_id': active_id}">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="packaging_level"/>
+                                    <field name="qty"/>
+                                    <field name="inner_qty" 
+                                           invisible="packaging_level == 'primary'"/>
+                                    <field name="is_vendor_packaging"/>
+                                    <field name="vendor_ids" 
+                                           widget="many2many_tags" 
+                                           options="{'no_create': True}" 
+                                           invisible="not is_vendor_packaging"/>
+                                    <field name="package_type_id"/>
+                                    <field name="barcode"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stock Picking Form View (extension with safe inherited fields) -->
+    <record id="view_picking_form_packaging" model="ir.ui.view">
+        <field name="name">stock.picking.form.packaging</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <!-- Add packaging buttons to header - using more reliable button position -->
+            <button name="button_validate" position="before">
+                <button name="action_create_packages" 
+                        type="object" 
+                        string="Create Packages" 
+                        class="oe_highlight"
+                        invisible="state not in ['assigned', 'done']"/>
+                
+                <button name="action_create_vendor_packages" 
+                        type="object" 
+                        string="Record Vendor Packages" 
+                        class="oe_highlight"
+                        invisible="picking_type_code != 'incoming' or state not in ['assigned', 'done']"/>
+                
+                <button name="action_view_packages" 
+                        type="object" 
+                        string="View Packages" 
+                        invisible="package_count == 0"/>
+            </button>
+            
+            <!-- Add packaging information to the notebook -->
+            <notebook position="inside">
+                <page string="Packaging" name="packaging">
+                    <group>
+                        <group string="Packaging Configuration">
+                            <field name="package_prefix" placeholder="Enter prefix for package names"/>
+                            <field name="packing_type"/>
+                            <field name="packaging_notes" placeholder="Additional notes about packaging"/>
+                            <field name="is_vendor_packaging" 
+                                   invisible="picking_type_code != 'incoming'"/>
+                        </group>
+                        <group string="Package Statistics">
+                            <field name="package_count"/>
+                            <field name="primary_package_count"/>
+                            <field name="secondary_package_count"/>
+                            <field name="tertiary_package_count"/>
+                            <field name="vendor_package_count" 
+                                   invisible="picking_type_code != 'incoming'"/>
+                        </group>
+                    </group>
+                    <group string="Weights">
+                        <group>
+                            <label for="gross_weight" string="Gross Weight"/>
+                            <div class="o_row">
+                                <field name="gross_weight" class="oe_inline" widget="float" readonly="1"/>
+                                <field name="weight_uom_name" nolabel="1" class="oe_inline" style="margin-left:5px"/>
+                            </div>
+                            
+                            <label for="net_weight" string="Net Weight"/>
+                            <div class="o_row">
+                                <field name="net_weight" class="oe_inline" widget="float" readonly="1"/>
+                                <field name="weight_uom_name" nolabel="1" class="oe_inline" style="margin-left:5px"/>
+                            </div>
+                            
+                            <label for="tare_weight" string="Tare Weight"/>
+                            <div class="o_row">
+                                <field name="tare_weight" class="oe_inline" widget="float" readonly="1"/>
+                                <field name="weight_uom_name" nolabel="1" class="oe_inline" style="margin-left:5px"/>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+    
+    <!-- Stock Picking List View (extension with safe fields) -->
+    <record id="view_picking_tree_packaging" model="ir.ui.view">
+        <field name="name">stock.picking.tree.packaging</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="package_count" optional="show"/>
+                <field name="gross_weight" optional="show"/>
+            </field>
+        </field>
+    </record>
+</odoo>

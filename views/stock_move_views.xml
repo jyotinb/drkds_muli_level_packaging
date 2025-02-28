@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stock Move Line Form View (standalone) -->
+    <record id="view_stock_move_line_form_packaging" model="ir.ui.view">
+        <field name="name">stock.move.line.form.packaging</field>
+        <field name="model">stock.move.line</field>
+        <field name="arch" type="xml">
+            <form string="Stock Move Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id" invisible="1"/>
+                            <field name="product_uom_category_id" invisible="1"/>
+                            <field name="move_id"/>
+                            <field name="product_id"/>
+                            <field name="product_uom_id"/>
+                            <field name="location_id"/>
+                            <field name="location_dest_id"/>
+                            <field name="quantity" string="Quantity"/>
+                        </group>
+                        <group>
+                            <field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}"/>
+                            <field name="package_id"/>
+                            <field name="result_package_id"/>
+                        </group>
+                    </group>
+                    <group string="Packaging" name="group_packaging">
+                        <field name="packaging_id" options="{'no_create': True}"/>
+                        <field name="loose_item_weight"/>
+                        <field name="is_vendor_packaged"/>
+                        <field name="vendor_package_ref" invisible="not is_vendor_packaged"/>
+                        <field name="needs_repackaging"/>
+                        <field name="repackaging_note" invisible="not needs_repackaging"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Stock Move Line Tree View -->
+    <record id="view_move_line_tree_detailed_packaging" model="ir.ui.view">
+        <field name="name">stock.move.line.tree.detailed.packaging</field>
+        <field name="model">stock.move.line</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Move Lines">
+                <field name="product_id"/>
+                <field name="product_uom_id"/>
+                <field name="location_id"/>
+                <field name="location_dest_id"/>
+                <field name="quantity"/>
+                <field name="lot_id"/>
+                <field name="package_id"/>
+                <field name="result_package_id"/>
+                <field name="loose_item_weight" optional="show"/>
+                <field name="packaging_id" optional="show"/>
+                <field name="is_vendor_packaged" optional="show"/>
+                <field name="vendor_package_ref" optional="show"/>
+                <field name="needs_repackaging" optional="show"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

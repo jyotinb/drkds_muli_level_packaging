@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Package Tree View (standalone) -->
+    <record id="view_quant_package_tree_enhanced" model="ir.ui.view">
+        <field name="name">stock.quant.package.tree.enhanced</field>
+        <field name="model">stock.quant.package</field>
+        <field name="arch" type="xml">
+            <tree string="Packages" decoration-danger="quality_state == 'rejected'" decoration-warning="quality_state == 'pending'" decoration-success="quality_state == 'approved'" decoration-primary="is_vendor_package">
+                <field name="name"/>
+                <field name="packaging_date"/>
+                <field name="package_level"/>
+                <field name="parent_package_id" optional="show"/>
+                <field name="mo_id" optional="hide"/>
+                <field name="picking_id" optional="hide"/>
+                <field name="purchase_id" optional="hide"/>
+                <field name="product_count" optional="show"/>
+                <field name="total_quantity" optional="show"/>
+                <field name="gross_weight" optional="show"/>
+                <field name="net_weight" optional="show"/>
+                <field name="quality_state" optional="show"/>
+                <field name="is_vendor_package" optional="show"/>
+                <field name="vendor_package_ref" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Package Form View (standalone) -->
+    <record id="view_quant_package_form_enhanced" model="ir.ui.view">
+        <field name="name">stock.quant.package.form.enhanced</field>
+        <field name="model">stock.quant.package</field>
+        <field name="arch" type="xml">
+            <form string="Package">
+                <header>
+                    <button name="action_set_quality_pending" 
+                            string="Set to Pending" 
+                            type="object" 
+                            class="btn-secondary"
+                            invisible="quality_state == 'pending'"/>
+                    <button name="action_approve_quality" 
+                            string="Approve" 
+                            type="object" 
+                            class="btn-success"
+                            invisible="quality_state == 'approved'"/>
+                    <button name="action_reject_quality" 
+                            string="Reject" 
+                            type="object" 
+                            class="btn-danger"
+                            invisible="quality_state == 'rejected'"/>
+                    <field name="quality_state" widget="statusbar" statusbar_visible="draft,pending,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_contained_packages" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-cubes" 
+                                invisible="child_package_ids == []">
+                            <field name="child_package_ids" string="Contained Packages" widget="statinfo"/>
+                        </button>
+                        <button name="action_print_package_label" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-print">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Print Label</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Package Reference"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="package_type_id"/>
+                            <field name="mo_id" readonly="1"/>
+                            <field name="picking_id" readonly="1"/>
+                            <field name="purchase_id" readonly="1"/>
+                            <field name="parent_package_id"/>
+                            <field name="package_level" readonly="1"/>
+                            <field name="packaging_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="product_count" readonly="1"/>
+                            <field name="total_quantity" readonly="1"/>
+                            <field name="gross_weight" readonly="1"/>
+                            <field name="net_weight" readonly="1"/>
+                            <field name="tare_weight" readonly="1"/>
+                        </group>
+                    </group>
+                    <group invisible="not is_vendor_package">
+                        <group string="Vendor Package Information">
+                            <field name="is_vendor_package" readonly="1"/>
+                            <field name="vendor_package_ref" readonly="1" 
+                                invisible="not is_vendor_package"/>
+                        </group>
+                    </group>
+                    <separator string="Package Contents"/>
+                    <field name="content_details" widget="html"/>
+                    <notebook>
+                        <page string="Quants">
+                            <field name="quant_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Package Search View (standalone) -->
+    <record id="view_quant_package_search_enhanced" model="ir.ui.view">
+        <field name="name">stock.quant.package.search.enhanced</field>
+        <field name="model">stock.quant.package</field>
+        <field name="arch" type="xml">
+            <search string="Package Search">
+                <field name="name"/>
+                <field name="mo_id"/>
+                <field name="picking_id"/>
+                <field name="purchase_id"/>
+                <field name="parent_package_id"/>
+                <field name="vendor_package_ref"/>
+                <field name="content_details"/>
+                <filter string="Available" name="available" domain="[('location_id.usage', '=', 'internal')]"/>
+                <separator/>
+                <filter string="Primary Packages" name="primary_packages" domain="[('package_level', '=', 'primary')]"/>
+                <filter string="Secondary Packages" name="secondary_packages" domain="[('package_level', '=', 'secondary')]"/>
+                <filter string="Tertiary Packages" name="tertiary_packages" domain="[('package_level', '=', 'tertiary')]"/>
+                <separator/>
+                <filter string="Vendor Packages" name="vendor_packages" domain="[('is_vendor_package', '=', True)]"/>
+                <filter string="Quality Pending" name="quality_pending" domain="[('quality_state', '=', 'pending')]"/>
+                <filter string="Quality Approved" name="quality_approved" domain="[('quality_state', '=', 'approved')]"/>
+                <filter string="Quality Rejected" name="quality_rejected" domain="[('quality_state', '=', 'rejected')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Package Level" name="group_by_level" domain="[]" context="{'group_by': 'package_level'}"/>
+                    <filter string="Manufacturing Order" name="group_by_mo" domain="[]" context="{'group_by': 'mo_id'}"/>
+                    <filter string="Transfer" name="group_by_picking" domain="[]" context="{'group_by': 'picking_id'}"/>
+                    <filter string="Purchase Order" name="group_by_purchase" domain="[]" context="{'group_by': 'purchase_id'}"/>
+                    <filter string="Quality Status" name="group_by_quality" domain="[]" context="{'group_by': 'quality_state'}"/>
+                    <filter string="Packaging Date" name="group_by_date" domain="[]" context="{'group_by': 'packaging_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Package Action Window -->
+    <record id="action_package_view" model="ir.actions.act_window">
+        <field name="name">Packages</field>
+        <field name="res_model">stock.quant.package</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_quant_package_tree_enhanced"/>
+        <field name="search_view_id" ref="view_quant_package_search_enhanced"/>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No package found
+            </p>
+            <p>
+                This menu shows all packages in your inventory.
+                Packages can be created from manufacturing orders,
+                transfer operations, or receipt processing.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_packaging_root" name="Packaging" 
+              parent="stock.menu_stock_inventory_control" sequence="5"/>
+
+    <menuitem id="menu_packaging_all" name="All Packages" 
+              parent="menu_packaging_root" 
+              action="action_package_view" sequence="1"/>
+</odoo>
