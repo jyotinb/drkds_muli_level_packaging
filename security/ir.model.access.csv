@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_packaging_wizard_user,packaging.wizard.user,model_packaging_wizard,stock.group_stock_user,1,1,1,1
+access_picking_packaging_wizard_user,picking.packaging.wizard.user,model_picking_packaging_wizard,stock.group_stock_user,1,1,1,1
+access_picking_packaging_wizard_line_user,picking.packaging.wizard.line.user,model_picking_packaging_wizard_line,stock.group_stock_user,1,1,1,1
+access_receipt_packaging_wizard_user,receipt.packaging.wizard.user,model_receipt_packaging_wizard,stock.group_stock_user,1,1,1,1
+access_receipt_packaging_wizard_line_user,receipt.packaging.wizard.line.user,model_receipt_packaging_wizard_line,stock.group_stock_user,1,1,1,1
+access_secondary_packaging_wizard_user,secondary.packaging.wizard.user,model_secondary_packaging_wizard,stock.group_stock_user,1,1,1,1
